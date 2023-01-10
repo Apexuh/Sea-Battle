@@ -180,7 +180,7 @@ class GamePole:
 
 class Player(GamePole):
     def take_shot(self):
-        x, y = randint(0, 9), randint(0, 9)
+        x, y = randint(0, self._size - 1), randint(0, self._size - 1)
         self.make_shot(x, y)
 
 
@@ -206,6 +206,13 @@ class Enemy(GamePole):
         print(s)
         print('=' * 19)
 
+
+
+
+
+
+
+
 # RUN
 if __name__ == '__main__':
     print('Hello! This is a sea battle game. Differs from the original in that ships can move in it.\n'
@@ -217,6 +224,7 @@ if __name__ == '__main__':
     player = Player(SIZE_GAME_POLE, input('Input your name please:   '))
     player.init()
     player.show()
+    enemy.init()
     r = 0
     while len(player) > 0 or len(enemy) > 0:
         r += 1
