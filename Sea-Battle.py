@@ -79,13 +79,17 @@ class GamePole:
     def init(self):
         count_ships = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1]
         self._ships = [Ship(i, tp=randint(1, 2)) for i in count_ships]
-        self.istallation_ships()
+        self.installation_ships()
 
 
-    def istallation_ships(self):
+    def installation_ships(self):
         '''установка кораблей на поле(рандомно), данные о кораблях берутся из списка self._ships'''
+        counter = 0
         i = 0
         while i < 10:
+            counter += 1
+            if counter > 100:
+                self.installation_ships()
             ship = self._ships[i]
             x = randint(0, self._size)
             y = randint(0, self._size)
@@ -153,11 +157,15 @@ class GamePole:
             if (x, y) in boat.ship_position():
                 boat._cells[boat.ship_position().index((x, y))] = 2
                 ship_is_broken = all(list(map(lambda x: x == 2, boat._cells)))
+                self._shots[x][y] = '#'
                 if boat._is_move:
                     boat._is_move = False
                 if ship_is_broken:
-                    print(f'{self._name} ship with {boat._length} deck(s) was destroyed')
+                    print(f"{self._name}'s ship with {boat._length} deck(s) was destroyed")
                     self._ships.remove(boat)
+                    for coords in boat.ship_position():
+                        i, j = coords
+                        self._shots[i][j] = 0
                 else:
 
                     print(f'There was a hit on the {self._name} ship in coords: {(x + 1, y + 1)}')
@@ -188,8 +196,8 @@ class Enemy(GamePole):
         except:
             print('Error in coords, try again...')
             self.take_shot()
+        self._shots[x - 1][y - 1] = 'X'
         self.make_shot(x - 1, y - 1)
-        self._shots[x][y] = 'X'
 
     def show(self):
         '''- отображение игрового поля в консоли (корабли отображаются значениями из коллекции _cells каждого корабля,
@@ -200,11 +208,13 @@ class Enemy(GamePole):
 
 # RUN
 if __name__ == '__main__':
+    print('Hello! This is a sea battle game. Differs from the original in that ships can move in it.\n'
+        'If you get on a ship, it will go to the bottom and clear the place for other ships.\n'
+        'if you get in a ship, it will no longer be able to sail away.\n'
+         'Good luck!')
     SIZE_GAME_POLE = 10
-
     enemy = Enemy(SIZE_GAME_POLE, 'Enemy')
     player = Player(SIZE_GAME_POLE, input('Input your name please:   '))
-    enemy.init()
     player.init()
     player.show()
     r = 0
@@ -214,11 +224,11 @@ if __name__ == '__main__':
         enemy.take_shot()
         player.take_shot()
         print(f'You have {len(player)} ships afloat')
-        print(f'Your enemy have {len(enemy)} ships afloat')
+        print(f'Your enemy has {len(enemy)} ships afloat')
         print('=' * 19)
         player.move_ships()
         enemy.move_ships()
-        print('enemy')
+        print('Your shots')
         enemy.show()
     winner = player._name if len(player) > len(enemy) else enemy._name if len(enemy) > len(player) else None
     if not winner:
@@ -228,13 +238,7 @@ if __name__ == '__main__':
 
 
 
-
-# pole.move_ships()
-# print()
-# pole.show()
-# pole.take_shot(1,2)
-
-
+# ============================================================================================================
 
 
 
