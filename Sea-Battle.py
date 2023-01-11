@@ -76,9 +76,11 @@ class GamePole:
         self._shots = [[0] * self._size for _ in range(self._size)]
 
 
+
     def init(self):
-        count_ships = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1]
-        self._ships = [Ship(i, tp=randint(1, 2)) for i in count_ships]
+        type_of_ships = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1]
+        self._count_of_ships = len(type_of_ships)
+        self._ships = [Ship(i, tp=randint(1, 2)) for i in type_of_ships]
         self.installation_ships()
 
 
@@ -157,15 +159,18 @@ class GamePole:
             if (x, y) in boat.ship_position():
                 boat._cells[boat.ship_position().index((x, y))] = 2
                 ship_is_broken = all(list(map(lambda x: x == 2, boat._cells)))
-                self._shots[x][y] = '#'
+                self._shots[x][y] = 'X'
                 if boat._is_move:
                     boat._is_move = False
                 if ship_is_broken:
                     print(f"{self._name}'s ship with {boat._length} deck(s) was destroyed")
-                    self._ships.remove(boat)
+                    self._count_of_ships -= 1
+                    for coords in boat.is_collide_location():
+                        i, j = coords
+                        self._shots[i][j] = '*'
                     for coords in boat.ship_position():
                         i, j = coords
-                        self._shots[i][j] = 0
+                        self._shots[i][j] = 'X'
                 else:
 
                     print(f'There was a hit on the {self._name} ship in coords: {(x + 1, y + 1)}')
@@ -176,12 +181,13 @@ class GamePole:
 
 
     def __len__(self):
-        return len(self._ships)
+        return self._count_of_ships
 
 class Player(GamePole):
     def take_shot(self):
         x, y = randint(0, self._size - 1), randint(0, self._size - 1)
         self.make_shot(x, y)
+
 
 
 class Enemy(GamePole):
@@ -196,7 +202,7 @@ class Enemy(GamePole):
         except:
             print('Error in coords, try again...')
             self.take_shot()
-        self._shots[x - 1][y - 1] = 'X'
+        self._shots[x - 1][y - 1] = '*'
         self.make_shot(x - 1, y - 1)
 
     def show(self):
